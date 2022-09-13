@@ -4,9 +4,9 @@ const Post = require("../models/Post");
 module.exports.createPost = async (req, res, next) => {
   try {
     const { body } = req;
-    await Post.create(body, (err, post) => {
+    Post.create(body, (err, post) => {
       if (err) {
-        next(createError(400, "Bad request. Try again!"));
+        next(createError(400, "Bad request. Try again!" + err.message));
       }
       res.status(201).send(post);
     });
@@ -37,8 +37,7 @@ module.exports.updatePost = async (req, res, next) => {
     // res.status(200).send(post);
     Post.findByIdAndUpdate(postId, body, {new:true, runValidators:true}, (err, post)=>{
       if(err){
-        console.log(err.message)
-        next(createError(400, err.message));
+        next(createError(404, err.message));
       }
       res.status(200).send(post);
     });
@@ -52,17 +51,20 @@ module.exports.deletePost = async (req, res, next) => {
     const {
       params: { postId },
     } = req;
-    const post = await Post.findByIdAndDelete(postId);
-    if(!post){
-      next(createError(404,'Post not found!'));
-    }
-    res.status(200).send(post);
-    // await Post.findByIdAndDelete(postId, (err, post) => {
-    //   if (err) {
-    //     return next(createError(400, "Bad request. Try again!"));
-    //   }
-    //   res.status(201).send(post);
-    // });
+    // const post = await Post.findByIdAndDelete(postId);
+    // if(!post){
+    //   next(createError(404,'Post not found!'));
+    // }
+    // res.status(200).send(post);
+    Post.findByIdAndDelete(postId, (err, post) => {
+      if (err) {
+        return next(createError(400, "Bad request."+err.message));
+      }
+      if (post) {
+        return res.status(200).send(post);
+      }
+      return next(createError(404, "Post not found")); 
+    });
   } catch (error) {
     next(error);
   }
