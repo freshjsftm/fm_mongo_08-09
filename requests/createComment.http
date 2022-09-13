@@ -1,0 +1,6 @@
+POST http://localhost:3000/632041dd05a6149cd99084ef/comments HTTP/1.1
+Content-Type: application/json
+
+{
+  "comment":"new comment 3 for post QWERTY 632041dd05a6149cd99084ef"
+}
